@@ -1,6 +1,8 @@
 package org.authx.authx.controller;
 
 
+import org.authx.authx.refreshtoken.RefreshToken;
+import org.authx.authx.refreshtoken.RefreshTokenService;
 import org.authx.authx.security.JwtService;
 import org.authx.authx.user.*;
 import org.springframework.http.HttpStatus;
@@ -18,11 +20,13 @@ public class AuthController {
     private final LoginService loginService;
     private final JwtService jwtService;
     private final SignupService signupService;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthController(LoginService loginService , JwtService jwtService, SignupService signupService){
+    public AuthController(LoginService loginService , JwtService jwtService, SignupService signupService, RefreshTokenService refreshTokenService){
         this.loginService=loginService;
         this.jwtService=jwtService;
         this.signupService = signupService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/login")
@@ -30,9 +34,10 @@ public class AuthController {
 
         try {
             User user = loginService.authenticate(loginRequest.email(), loginRequest.password());
-             String token= jwtService.generateToken(user);
+             String acessToken= jwtService.generateToken(user);
+             RefreshToken refreshToken = refreshTokenService.create(user);
 
-             return ResponseEntity.ok(new LoginResponse(token,jwtService.getExpirationSeconds(),
+             return ResponseEntity.ok(new LoginResponse(acessToken,refreshToken.getToken(),jwtService.getExpirationSeconds(),
                      user.getRole()));
         }
         catch(InvalidCredentialsException ex){
