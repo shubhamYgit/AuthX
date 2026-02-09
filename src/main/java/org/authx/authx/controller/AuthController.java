@@ -1,6 +1,7 @@
 package org.authx.authx.controller;
 
 
+import org.authx.authx.security.JwtService;
 import org.authx.authx.user.InvalidCredentialsException;
 import org.authx.authx.user.LoginService;
 import org.authx.authx.user.User;
@@ -19,9 +20,11 @@ import org.springframework.web.client.HttpClientErrorException;
 @Validated
 public class AuthController {
     private final LoginService loginService;
+    private final JwtService jwtService;
 
-    public AuthController(LoginService loginService){
+    public AuthController(LoginService loginService , JwtService jwtService){
         this.loginService=loginService;
+        this.jwtService=jwtService;
     }
 
     @PostMapping("/login")
@@ -29,7 +32,9 @@ public class AuthController {
 
         try {
             User user = loginService.authenticate(loginRequest.email(), loginRequest.password());
-            return ResponseEntity.ok().build();
+             String token= jwtService.generateToken(user);
+
+             return ResponseEntity.ok(new LoginResponse(token,jwtService.getExpirationSeconds()));
         }
         catch(InvalidCredentialsException ex){
            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
