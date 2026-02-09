@@ -12,7 +12,7 @@ public class PasswordHashGenerator {
     CommandLineRunner generateHash() {
         return args -> {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            String hash = encoder.encode("password");
+            String hash = encoder.encode("admin123");
             System.out.println("BCrypt hash: " + hash);
         };
     }

@@ -13,7 +13,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false , length=255)
     private String email;
@@ -24,17 +24,24 @@ public class User {
     @Column(nullable = false)
     private boolean enabled;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    @Column(name="roles" , nullable = false , length = 50)
+    private String role;
 
     protected User(){}
 
-    public User(long id, String email, String passwordHash, boolean enabled, Instant createdAt) {
+    public User(Long id,String email, String passwordHash, boolean enabled, Instant createdAt,String role) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
         this.enabled = enabled;
         this.createdAt = createdAt;
+        this.role=role;
     }
+
+
 
     public Long getId() {
         return id;
@@ -54,5 +61,9 @@ public class User {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

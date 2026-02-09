@@ -35,6 +35,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(user.getId().toString())
                 .claim("email", user.getEmail())
+                .claim("role",user.getRole())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusSeconds(expirationSeconds)))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
