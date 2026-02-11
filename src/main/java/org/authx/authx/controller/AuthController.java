@@ -63,4 +63,16 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/user/test")
+    @PreAuthorize("hasRole('USER')or hasRole('ADMIN')")
+    public String userTest(){
+        return "user OK";
+    }
+
+    @GetMapping("/user/test2")
+    @PreAuthorize("hasRole('USER')or hasRole('ADMIN')")
+    public String userTest2(){
+        return "user OK";
+    }
+
 }

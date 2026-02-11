@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -13,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
 
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -24,10 +25,15 @@ public class SecurityConfig {
 
 
         http
+                .cors(cors -> {})
              .formLogin(form -> form.disable()).
              httpBasic(basic -> basic.disable()).
              csrf(csrf -> csrf.disable()).
+                sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                ).
              authorizeHttpRequests(auth -> auth.
+                     requestMatchers("/", "/index.html", "/styles.css", "/app.js", "/favicon.ico").permitAll().
                      requestMatchers("/auth/login","/auth/signup").permitAll().
                      requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN").
                       anyRequest().authenticated()).addFilterBefore(jwtAuthenticationFilter,

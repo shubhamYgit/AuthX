@@ -48,6 +48,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String userId=claims.getBody().getSubject();
 
             String role=claims.getBody().get("role",String.class);
+//            System.out.println(claims.getBody());
+
+            if (role == null) {
+                throw new RuntimeException("Role claim missing in JWT");
+            }
+
+            if (!role.startsWith("ROLE_")) {
+                role = "ROLE_" + role;
+            }
+
+
             UsernamePasswordAuthenticationToken authentication=new UsernamePasswordAuthenticationToken(
                     userId,
                     null,
