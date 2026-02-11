@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthX Frontend</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main class="container">
+    <header>
+        <h1>AuthX Playground</h1>
+        <p>Use this UI to sign up, log in, and call protected endpoints.</p>
+    </header>
+
+    <section class="card">
+        <h2>Sign Up</h2>
+        <form id="signup-form">
+            <label for="signup-email">Email</label>
+            <input id="signup-email" type="email" required>
+
+            <label for="signup-password">Password</label>
+            <input id="signup-password" type="password" minlength="6" required>
+
+            <button type="submit">Create account</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Login</h2>
+        <form id="login-form">
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" required>
+
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" required>
+
+            <button type="submit">Log in</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Session</h2>
+        <div class="actions">
+            <button id="admin-test-btn" type="button">Call /auth/admin/test</button>
+            <button id="clear-session-btn" type="button" class="secondary">Clear local session</button>
+        </div>
+        <p><strong>Role:</strong> <span id="role">—</span></p>
+        <label for="access-token">Access token</label>
+        <textarea id="access-token" readonly></textarea>
+        <label for="refresh-token">Refresh token</label>
+        <textarea id="refresh-token" readonly></textarea>
+    </section>
+
+    <section class="card">
+        <h2>Output</h2>
+        <pre id="output" aria-live="polite">Ready.</pre>
+    </section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>
