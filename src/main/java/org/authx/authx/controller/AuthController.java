@@ -5,13 +5,14 @@ import org.authx.authx.refreshtoken.RefreshToken;
 import org.authx.authx.refreshtoken.RefreshTokenService;
 import org.authx.authx.security.JwtService;
 import org.authx.authx.user.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+
+import java.time.Duration;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,7 +38,16 @@ public class AuthController {
              String acessToken= jwtService.generateToken(user);
              RefreshToken refreshToken = refreshTokenService.create(user);
 
-             return ResponseEntity.ok(new LoginResponse(acessToken,refreshToken.getToken(),jwtService.getExpirationSeconds(),
+
+            ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken.getToken())
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/auth/refresh")
+                    .maxAge(Duration.ofDays(14))
+                    .sameSite("Strict")
+                    .build();
+
+             return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(acessToken,jwtService.getExpirationSeconds(),
                      user.getRole()));
         }
         catch(InvalidCredentialsException ex){
@@ -62,6 +72,36 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(
+            @CookieValue(name = "refresh_token", required = false) String token
+    ) {
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        RefreshToken refreshToken = refreshTokenService.verify(token);
+        User user = refreshToken.getUser();
+        refreshTokenService.delete(refreshToken);
+        RefreshToken newRefresh = refreshTokenService.create(user);
+        String newAccessToken = jwtService.generateToken(user);
+        ResponseCookie newCookie = ResponseCookie.from("refresh_token", newRefresh.getToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/auth/refresh")
+                .maxAge(Duration.ofDays(14))
+                .sameSite("Strict")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, newCookie.toString())
+                .body(Map.of(
+                        "accessToken", newAccessToken,
+                        "expiresIn", jwtService.getExpirationSeconds()
+                ));
+    }
+
+
 
     @GetMapping("/user/test")
     @PreAuthorize("hasRole('USER')or hasRole('ADMIN')")

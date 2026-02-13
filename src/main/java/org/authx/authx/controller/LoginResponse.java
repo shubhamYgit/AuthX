@@ -4,7 +4,7 @@ import java.time.Instant;
 
 public record LoginResponse(
         String accessToken,
-        String refreshToken,
+//        String refreshToken,
         long expiresIn,
         String role
 

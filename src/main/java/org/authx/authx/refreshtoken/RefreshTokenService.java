@@ -36,6 +36,11 @@ public class RefreshTokenService {
         return rt;
     }
 
+    public void delete(RefreshToken refreshToken) {
+        refreshTokenRepository.delete(refreshToken);
+    }
+
+
     public void revoke(RefreshToken token) {
         token.setRevoked(true);
         refreshTokenRepository.save(token);
